@@ -1,0 +1,93 @@
+.ztree {
+  margin:0;
+  padding:5px;
+  color:#333;
+  font-size: 14px;
+}
+a {
+  color: rgba(0, 0, 0, 0.65)
+}
+.ztree li{
+  padding:0;
+  margin: 6px;
+  list-style:none;
+  line-height: 24px;
+  text-align:left;
+  white-space:nowrap;
+  outline:0;
+}
+.ztree li ul{
+  margin:0;
+  padding:0 0 0 18px;
+}
+.ztree li span {
+  line-height:21px;
+  margin-right:2px;
+}
+.ztree li span.button {
+  line-height:0;
+  margin:0; padding: 0;
+  width:21px;
+  height:21px;
+  display: inline-block;
+  vertical-align:middle;
+  cursor: pointer;
+  outline: none;
+}
+.ztree li span.button.chk {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.checkbox_true_full{
+  background-color: #1890ff;
+  position: relative;
+}
+.checkbox_true_full::after {
+  position: absolute;
+  top: 50%;
+  left: 21%;
+  display: table;
+  width: 5.71428571px;
+  height: 9.14285714px;
+  border: 2px solid #fff;
+  border-top: 0;
+  border-left: 0;
+  transition: all 0.1s cubic-bezier(0.71, -0.46, 0.88, 0.6), opacity 0.1s;
+  content: ' ';
+  transform: rotate(45deg) scale(1) translate(-50%, -50%);
+  opacity: 1;
+}
+.arrow--close {
+  transform: rotate(90deg);
+  transition: transform .25s linear;
+}
+.arrow--open {
+  transform: rotate(0deg);
+  transition: transform .25s linear;
+}
+.bottom_open {
+  font-size: 0;
+  line-height: 0;
+  vertical-align: middle;
+  border-width: 4px;
+  border-color: #314659;
+  border-right-width: 0;
+  border-style: dashed;
+  border-left-style: solid;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  padding-right: 5px;
+  margin-top: 11px;
+  position: relative;
+  left: 10px;
+}
+.tree--show {
+  position:relative;
+  width:21px;
+  height:21px;
+  display: inline-block;
+}
