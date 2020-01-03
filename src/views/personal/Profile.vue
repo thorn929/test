@@ -5,7 +5,7 @@
       <a-row :gutter="10">
         <a-col :span="10">
           <a-row style="text-align: center">
-            <img style="max-width: 10rem;width: 100%;border-radius: 2px" alt="头像" :src="avatar">
+            <img style="max-width: 10rem;width: 100%;border-radius: 2px" alt="头像" :src="require(`@/assets/${avatar}`)"/>
           </a-row>
           <a-row style="text-align: center">
             <a-button icon="edit" style="margin-top:1rem" @click="updateAvatar">修改头像</a-button>
@@ -65,7 +65,7 @@ export default {
       user: state => state.account.user
     }),
     avatar () {
-      return `assets/avatar/${this.user.userAvatar}`
+      return `avatar/${this.user.userAvatar}`
     },
     sex () {
       switch (this.user.userSex) {

@@ -10,14 +10,14 @@
       <a-tab-pane tab="动物" key="1" forceRender>
         <template v-for="(avatar, index) in al">
           <div class="avatar-wrapper" :key="index">
-            <img alt="点击选择" :src="'asstes/avatar/' + avatar" @click="change(avatar)">
+            <img alt="点击选择" :src="require(`@/assets/avatar/${avatar}`)" @click="change(avatar)">
           </div>
         </template>
       </a-tab-pane>
       <a-tab-pane tab="脸萌" key="2">
         <template v-for="(avatar, index) in lm">
           <div class="avatar-wrapper" :key="index">
-            <img alt="点击选择" :src="'asstes/avatar/' + avatar" @click="change(avatar)">
+            <img alt="点击选择" :src="require(`@/assets/avatar/${avatar}`)" @click="change(avatar)">
           </div>
         </template>
       </a-tab-pane>
