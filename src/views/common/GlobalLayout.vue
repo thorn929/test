@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     paddingLeft () {
-      return this.fixSiderbar && this.layout === 'side' && `${this.sidebarOpened ? 256 : 80}px`
+      return this.fixSiderbar && this.layout === 'side' && `${this.sidebarOpened ? 226 : 80}px`
     },
     ...mapState({
       sidebarOpened: state => state.setting.sidebar.opened,

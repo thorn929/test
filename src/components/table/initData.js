@@ -605,7 +605,7 @@ export function initFun (_this) {
       ]
     },
     patientOrder: {
-      title: 'patientName',
+      title: 'orderNo',
       id: 'produceOrderId',
       columns: [
         {
@@ -639,6 +639,59 @@ export function initFun (_this) {
         {
           title: '套餐名称',
           dataIndex: 'useComboName'
+        },
+        {
+          title: '创建时间',
+          dataIndex: 'createTime',
+          sorter: true,
+          sortOrder: sortedInfo.columnKey === 'createTime' && sortedInfo.order
+        },
+        {
+          title: '操作',
+          dataIndex: 'operation',
+          scopedSlots: { customRender: 'operation' },
+          fixed: 'right',
+          width: 120
+        }
+      ]
+    },
+    followPlanMaster: {
+      title: 'patientName',
+      id: 'followId',
+      columns: [
+        {
+          title: '订单号',
+          dataIndex: 'orderName'
+        },
+        {
+          title: '患者名称',
+          dataIndex: 'patientName'
+        },
+        {
+          title: '随访类型',
+          dataIndex: 'followTypeName'
+        },
+        {
+          title: '问卷名称',
+          dataIndex: 'followQuestionnaireName'
+        },
+        {
+          title: '随访日期',
+          dataIndex: 'followTime'
+        },
+        {
+          title: '随访状态',
+          dataIndex: 'followState',
+          customRender: (text) => {
+            switch (text) {
+              case 0:
+                return '待随访'
+              case 1:
+                return '已随访'
+              default:
+                return text
+            }
+          }
         },
         {
           title: '创建时间',

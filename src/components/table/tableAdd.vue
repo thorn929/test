@@ -43,7 +43,6 @@
             ]"/>
         </template>
         <!-- 角色、部门、医院、标签类型因需要单独拉接口 TODO： 如何优化这一部分-->
-
         <!-- 标签类型 -->
         <template v-if='item.type == "labelName"'>
           <a-select style="width: 100%" mode="multiple" v-decorator="['labelName']">
@@ -70,19 +69,19 @@
         </template>
         <!-- 患者列表 -->
          <template v-if='item.type == "patientId"'>
-          <a-select style="width: 100%" v-decorator="['patientId']" @change='changePatient'>
+          <a-select style="width: 100%"  v-decorator="['patientId', {rules: [{ required: true, message: '不能为空'}]}]">
             <a-select-option  v-for="r in dropPatientData" :key="r.patientId">{{r.patientName}}</a-select-option>
           </a-select>
         </template>
          <!-- 产品类型 -->
          <template v-if='item.type == "productId"'>
-          <a-select style="width: 100%" v-decorator="['productId', {rules: [{ required: true, message:  '不能为空'}]}]" @change='changeProduct'>
+          <a-select style="width: 100%" v-decorator="['productId', {rules: [{ required: true, message:  '不能为空'}]}]">
             <a-select-option  v-for="r in dropProductData" :key="r.dictId">{{r.dictName}}</a-select-option>
           </a-select>
         </template>
          <!-- 项目类型 -->
          <template v-if='item.type == "projectId"'>
-          <a-select style="width: 100%"  v-decorator="['projectId', {rules: [{ required: true, message: '不能为空'}]}]" @change='changeProject' >
+          <a-select style="width: 100%"  v-decorator="['projectId', {rules: [{ required: true, message: '不能为空'}]}]">
             <a-select-option  v-for="r in dropProjectData" :key="r.dictId">{{r.dictName}}</a-select-option>
           </a-select>
         </template>
@@ -91,6 +90,28 @@
           <a-select style="width: 100%" v-decorator="['useCombo']" @change='changeCombo'>
             <a-select-option  v-for="r in dropUseComboData" :key="r.dictId">{{r.dictName}}</a-select-option>
           </a-select>
+        </template>
+        <!-- 患者订单Id -->
+         <template v-if='item.type == "orderId"'>
+          <a-select style="width: 100%"  v-decorator="['orderId', {rules: [{ required: true, message: '不能为空'}]}]">
+            <a-select-option  v-for="r in dropPatientOrderData" :key="r.produceOrderId">{{r.orderNo}}</a-select-option>
+          </a-select>
+        </template>
+        <!-- 随访问卷Id -->
+         <template v-if='item.type == "followQuestionnaireId"'>
+          <a-select style="width: 100%"  v-decorator="['followQuestionnaireId', {rules: [{ required: true, message: '不能为空'}]}]">
+            <a-select-option  v-for="r in dropQuestionnaireData" :key="r.questionnaireId">{{r.questionnaireName}}</a-select-option>
+          </a-select>
+        </template>
+         <!-- 随访类型 -->
+         <template v-if='item.type == "followType"'>
+          <a-select style="width: 100%"  v-decorator="['followType', {rules: [{ required: true, message: '不能为空'}]}]">
+            <a-select-option  v-for="r in dropFollowTypeData" :key="r.dictId">{{r.dictName}}</a-select-option>
+          </a-select>
+        </template>
+        <!-- 随访时间 -->  
+        <template v-if='item.type == "followTime"' > 
+          <a-date-picker format="YYYY-MM-DD"  mode='time' @change='changTime' placeholder="选择时间" />
         </template>
          <!-- 问卷 -->
          <template v-if='item.type == "questionnaireId"'>
@@ -202,7 +223,7 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-import {Form, Button, Input, Icon, Drawer, Select, Radio, Popconfirm, Tree} from 'ant-design-vue'
+import {Form, Button, Input, Icon, Drawer, Select, Radio, Popconfirm, Tree, DatePicker} from 'ant-design-vue'
 const comData = require('./comData')
 const formItemLayout = {
   labelCol: { span: 4 },
@@ -238,7 +259,11 @@ export default {
       dropProjectData: [],
       dropProductData: [],
       dropUseComboData: [],
-      dropPatientData: []
+      dropPatientData: [],
+      dropFollowTypeData: [],
+      dropPatientOrderData: [],
+      dropQuestionnaireData: [],
+      followTime: ''
     }
   },
   components: {
@@ -254,7 +279,8 @@ export default {
     ARadioGroup: Radio.Group,
     APopconfirm: Popconfirm,
     ATextarea: Input.TextArea,
-    ATree: Tree
+    ATree: Tree,
+    ADatePicker : DatePicker 
   },
   computed: {
     comData () {
@@ -369,8 +395,11 @@ export default {
             case 'patientOrder':
               values.userId = this.userInfo.userId
               break
+            // 随访计划
+            case 'followPlanMaster':
+              values.followTime = this.followTime
+              break
           }
-
           this.$post(`/${this.moduleType}/${this.routerName}`, {
             ...values
           }, isRaw).then((res) => {
@@ -418,17 +447,9 @@ export default {
     handleExpand (expandedKeys) {
       this.expandedKeys = expandedKeys
     },
-    changeCombo (value) {
-      alert(value)
-    },
-    changeProject (value) {
-      alert(value)
-    },
-    changeProduct (value) {
-      alert(value)
-    },
-    changePatient (value) {
-      alert(value)
+    changTime(value, dateString) {
+      console.log(new Date(dateString))
+      this.followTime = new Date(dateString)
     }
   },
   watch: {
@@ -459,7 +480,7 @@ export default {
           })
         }
         // 因为后台表的问题，不想一个方法多重判断了，只能重新复制
-        let fetchMultid = (prefix, arr) => {
+        let fetchMultiOther = (prefix, arr) => {
           const promises = arr.map(url => {
             return this.$get(prefix + url).then(res => {
               if (res.data.code === 200) {
@@ -506,7 +527,10 @@ export default {
             break
           case 'patientOrder':
             fetchMulti('/manage/sys/', ['role', 'department', 'hospital'])
-            fetchMultid('/manage/result/patientOrder/', ['dropProduct', 'dropProject', 'dropUseCombo', 'dropPatient'])
+            fetchMultiOther('/manage/result/patientOrder/', ['dropProduct', 'dropProject', 'dropUseCombo', 'dropPatient'])
+          case 'followPlanMaster':
+            fetchMultiOther('/manage/result/patientOrder/', ['dropPatient'])
+            fetchMultiOther('/manage/result/followPlanMaster/', ['dropFollowType', 'dropPatientOrder', 'dropQuestionnaire'])
         }
       },
       immediate: true

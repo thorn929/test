@@ -95,6 +95,28 @@
             <a-select-option  v-for="r in dropProjectData" :key="r.dictId">{{r.dictName}}</a-select-option>
           </a-select>
         </template>
+         <!-- 患者订单Id -->
+         <template v-if='item.type == "orderId"'>
+          <a-select style="width: 100%"  v-decorator="['orderName', {rules: [{ required: true, message: '不能为空'}]}]" @change='changeOrder' >
+            <a-select-option  v-for="r in dropPatientOrderData" :key="r.produceOrderId">{{r.orderNo}}</a-select-option>
+          </a-select>
+        </template>
+        <!-- 随访问卷Id -->
+         <template v-if='item.type == "followQuestionnaireId"'>
+          <a-select style="width: 100%"  v-decorator="['followQuestionnaireName', {rules: [{ required: true, message: '不能为空'}]}]" @change='changeQuestion' >
+            <a-select-option  v-for="r in dropQuestionnaireData" :key="r.questionnaireId">{{r.questionnaireName}}</a-select-option>
+          </a-select>
+        </template>
+         <!-- 随访类型 -->
+         <template v-if='item.type == "followType"'>
+          <a-select style="width: 100%"  v-decorator="['followTypeName', {rules: [{ required: true, message: '不能为空'}]}]" @change='changeProject' >
+            <a-select-option  v-for="r in dropFollowTypeData" :key="r.dictId">{{r.dictName}}</a-select-option>
+          </a-select>
+        </template>
+        <!-- 随访时间 -->  
+        <template v-if='item.type == "followTime"'>
+          <a-date-picker format="YYYY-MM-DD" @change='changTime' placeholder="选择时间" />
+        </template>
          <!-- 问卷 -->
          <template v-if='item.type == "questionnaireId"'>
           <a-select
@@ -208,8 +230,9 @@
   </a-drawer>
 </template>
 <script>
+import moment from 'moment'
 import { mapState } from 'vuex'
-import {Form, Button, Input, Icon, Drawer, Select, Radio, Popconfirm} from 'ant-design-vue'
+import {Form, Button, Input, Icon, Drawer, Select, Radio, Popconfirm, DatePicker} from 'ant-design-vue'
 import testTree from '@/components/tree/index'
 const comData = require('./comData')
 const formItemLayout = {
@@ -262,7 +285,11 @@ export default {
       dropProductData: [],
       dropUseComboData: [],
       dropPatientData: [],
-      followTypeData: []
+      followTypeData: [],
+      dropFollowTypeData: [],
+      dropPatientOrderData: [],
+      dropQuestionnaireData: [],
+      followTime: ''
     }
   },
   components: {
@@ -278,7 +305,8 @@ export default {
     ARadio: Radio,
     ARadioGroup: Radio.Group,
     APopconfirm: Popconfirm,
-    testTree
+    testTree,
+    ADatePicker : DatePicker 
   },
   computed: {
     comData () {
@@ -302,6 +330,7 @@ export default {
     this.form.getFieldDecorator('keys', { initialValue: [], preserve: true })
   },
   methods: {
+    moment,
     checkBoxCall (checkBox) {
       let arr = []
       checkBox.forEach(el => {
@@ -343,6 +372,15 @@ export default {
       }).catch(() => {})
     },
     async setFormValues ({...info}) {
+      this.followId = info.followId
+      this.orderId = info.orderId
+      this.followType = info.followType
+      this.followQuestionnaireId = info.followQuestionnaireId
+      this.followTime = info.followTime 
+      this.orderName = info.orderName
+      this.followTypeName = info.followTypeName
+      this.followQuestionnaireName = info.followQuestionnaireName
+      this.followTime = info.followTime
       this.subjectType = info.subjectType
       this.questionnaireId = info.questionnaireId
       this.subjectId = info.subjectId
@@ -485,6 +523,17 @@ export default {
       })
       return arr
     },
+    changeOrder (value) {
+      // 患者订单id
+      this.orderId = value
+    },
+    changeQuestion (value) {
+      // 随访问卷id
+      this.followQuestionnaireId = value
+    },
+    changTime (value, dateString) {
+      this.followTime = dateString
+    },
     handleSubmit () {
       // 如果当前为角色 需要获得权限id
       // let checkedArr = Object.is(this.checkedKeys.checked, undefined) ? this.checkedKeys : this.checkedKeys.checked
@@ -570,6 +619,15 @@ export default {
               moduleType = 'manage/label'
               name = 'subject'
               values.subjectType = this.subjectType
+              break
+            // 随访计划
+            case 'followPlanMaster':
+              values.followTime = new Date(this.followTime)
+              values.orderId = this.orderId
+              values.followType = this.followType
+              values.followQuestionnaireId = this.followQuestionnaireId
+              values.patientId = this.patientId
+              values.followId = this.followId
               break
           }
           if (name === 'questionnaireLeft') {
@@ -674,7 +732,7 @@ export default {
           })
         }
         // 因为后台表的问题，不想一个方法多重判断了，只能重新复制
-        let fetchMultid = (prefix, arr) => {
+        let fetchMultiOther = (prefix, arr) => {
           const promises = arr.map(url => {
             return this.$get(prefix + url).then(res => {
               if (res.data.code === 200) {
@@ -713,8 +771,11 @@ export default {
             break
           case 'patientOrder':
             fetchMulti()
-            fetchMultid('/manage/result/patientOrder/', ['dropProduct', 'dropProject', 'dropUseCombo', 'dropPatient'])
-            // fetch(`/manage/result/patientOrder/`, 'dropProductData')
+            fetchMultiOther('/manage/result/patientOrder/', ['dropProduct', 'dropProject', 'dropUseCombo', 'dropPatient'])
+            break
+          case 'followPlanMaster':
+            fetchMultiOther('/manage/result/patientOrder/', ['dropPatient'])
+            fetchMultiOther('/manage/result/followPlanMaster/', ['dropFollowType', 'dropPatientOrder', 'dropQuestionnaire'])
         }
       },
       immediate: true

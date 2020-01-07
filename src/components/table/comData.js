@@ -917,5 +917,45 @@ module.exports = {
         value: 'createTime'
       }
     ]
+  },
+  'followPlanMaster': {
+    addTitle: '新增患者订单',
+    editTitle: '修改患者订单',
+    infoTitle: '患者订单信息',
+    addArray: [
+      {
+        label: '订单ID',
+        type: 'orderId'
+      },
+      {
+        label: '患者ID',
+        type: 'patientId'
+      },
+      {
+        label: '随访问卷ID ',
+        type: 'followQuestionnaireId'
+      },
+      {
+        label: '随访类型 ',
+        type: 'followType'
+      },
+      {
+        label: '随访时间',
+        type: 'followTime'
+      }
+    ],
+    editArray: ['orderName', 'followQuestionnaireName', 'followTypeName', 'patientName'],
+    infoArray: [
+      {
+        type: '',
+        name: '订单号：',
+        value: 'orderNo'
+      },
+      {
+        type: '',
+        name: '创建时间：',
+        value: 'createTime'
+      }
+    ]
   }
 }

@@ -45,6 +45,34 @@
                 </a-form-item>
               </a-col>
             </a-row>
+             <a-row v-else-if='routerName === "followPlanMaster"'>
+              <a-col :md="8" :sm="24" >
+                <a-form-item
+                  label='患者名称'
+                  :labelCol="{span: 7}"
+                  :wrapperCol="{span: 15, offset: 1}">
+                  <a-input v-model="queryParams[listJson[routerName].title]"/>
+                </a-form-item>
+              </a-col>
+               <a-col :md="8" :sm="24" >
+                <a-form-item
+                  label='随访类型'
+                  :labelCol="{span: 7}"
+                  :wrapperCol="{span: 16, offset: 1}">
+                 <a-select style="width: 100%" @change='changeFollowType' allowClear>
+                    <a-select-option v-for="item in dropFollowTypeData" :key="item.dictId">{{item.dictName}}</a-select-option>
+                 </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24" >
+                <a-form-item
+                  label="时间"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 19, offset: 0}">
+                  <range-date @change="handleDateChange" ref="createTime"></range-date>
+                </a-form-item>
+              </a-col>
+            </a-row>
             <a-row v-else>
               <a-col :md="12" :sm="24" >
                 <a-form-item
@@ -219,6 +247,7 @@ export default {
       titleList: [],
       hospitalData: [],
       departmentData: [],
+      dropFollowTypeData: [],
       form: this.$form.createForm(this)
     }
   },
@@ -348,9 +377,13 @@ export default {
     changeHospital (value) {
       this.queryParams.hospitalId = value || ''
     },
-    fectchSelect () {
-      const promises = ['department', 'hospital'].map(url => {
-        return this.$get(`/manage/sys/` + url).then(res => {
+    changeFollowType (value) {
+      console.log(value)
+      this.queryParams.followType = value | ''
+    },
+    fectchMultiple (arr, pre) {
+      const promises = arr.map(url => {
+        return this.$get(pre + url).then(res => {
           if (res.data.code === 200) {
             res.data.data.url = url
             return res.data.data
@@ -368,8 +401,15 @@ export default {
   },
   created () {
     if (this.routerName === 'patientOrder') {
-      this.fectchSelect()
-    }
+      this.fectchMultiple(['department', 'hospital'], '/manage/sys/')
+    } 
+    if (this.routerName === 'followPlanMaster') {
+      this.$get( '/manage/result/followPlanMaster/dropFollowType').then((res) => {
+        if (res.data.code === 200) {
+          this.dropFollowTypeData = res.data.data
+        }
+      }).catch(() => {})
+    } 
     this.fetchSubject()
     this.getButtonList()
   }
